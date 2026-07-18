@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "rules": [
+    { "when": { "state": "weapon.current", "equals": "weapon_pistol" },
+      "apply": { "right_trigger": { "preset": "pistol" } } },
+    { "when": { "state": "weapon.current", "equals": "weapon_357" },
+      "apply": { "right_trigger": { "preset": "revolver" } } },
+    { "when": { "state": "weapon.current", "equals": "weapon_smg1" },
+      "apply": { "right_trigger": { "preset": "smg" } } },
+    { "when": { "state": "weapon.current", "equals": "weapon_ar2" },
+      "apply": { "right_trigger": { "preset": "assault_rifle" } } },
+    { "when": { "state": "weapon.current", "equals": "weapon_shotgun" },
+      "apply": { "right_trigger": { "preset": "heavy_shotgun" } } },
+    { "when": { "state": "weapon.current", "equals": "weapon_crossbow" },
+      "apply": { "right_trigger": { "preset": "crossbow" } } },
+    { "when": { "state": "weapon.current", "equals": "weapon_physcannon" },
+      "apply": { "right_trigger": { "preset": "gravity_weapon" } } },
+    { "on_event": "weapon.primary_fire",
+      "apply": { "haptic": { "preset": "weapon_recoil", "intensity": 0.8 } } },
+    { "when": { "state": "vehicle.current", "equals": "airboat" },
+      "apply": { "right_trigger": { "preset": "vehicle_accelerator" },
+                 "left_trigger": { "preset": "vehicle_brake" } } },
+    { "when": { "state": "weapon.reloading", "equals": "true" },
+      "apply": { "right_trigger": { "preset": "reload_locked" } } }
+  ]
+}

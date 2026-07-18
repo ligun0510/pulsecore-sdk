@@ -1,0 +1,17 @@
+# Normalize line endings: text files stored as LF in the repo.
+* text=auto eol=lf
+
+# Explicit types
+*.cpp   text
+*.h     text
+*.md    text
+*.json  text
+*.txt   text
+*.cmake text
+*.yml   text
+
+# Binary (never touch)
+*.png binary
+*.exe binary
+*.lib binary
+*.dll binary

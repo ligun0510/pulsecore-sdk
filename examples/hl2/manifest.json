@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "integration_id": "community.hl2.enhanced",
+  "name": "Half-Life 2 Enhanced DualSense",
+  "version": "1.0.0",
+  "author": "AuthorName",
+  "description": "Adaptive triggers and haptics for Half-Life 2",
+
+  "game": {
+    "name": "Half-Life 2",
+    "steam_app_id": 220,
+    "executables": ["hl2.exe"]
+  },
+
+  "protocol": { "name": "pulsecore-bridge", "version": 1 },
+
+  "integration_type": "source_mod",
+
+  "requirements": [
+    { "id": "source_sdk_base_2013_sp", "required": true }
+  ],
+
+  "installer": { "adapter": "source_mod", "payload_path": "payload" },
+
+  "permissions": ["write_game_directory", "install_native_plugin", "launch_custom_executable"],
+
+  "security": {
+    "trust_level": "community",
+    "contains_native_code": true,
+    "source_repository": "https://github.com/example/hl2-pulsecore-integration",
+    "sha256_manifest": true
+  }
+}

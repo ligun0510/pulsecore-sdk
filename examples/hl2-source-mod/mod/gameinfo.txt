@@ -1,0 +1,25 @@
+"GameInfo"
+{
+	game		"Half-Life 2 — PulseCore Enhanced"
+	title		"PulseCore HL2"
+	type		singleplayer_only
+
+	// This is a Half-Life 2 mod that runs on Source SDK Base 2013 Singleplayer. It adds the PulseCore
+	// integration client (adaptive triggers + haptics on a DualSense via PulseCore); it does not modify
+	// Half-Life 2's own files. Copy this folder to:
+	//   <Steam>/steamapps/sourcemods/PulseCore_HL2/
+	// then restart Steam so it appears in the library, and replace client.dll/server.dll under bin/
+	// with your built mod binaries (see README).
+
+	FileSystem
+	{
+		SteamAppId				243730		// Source SDK Base 2013 Singleplayer (the engine to run on)
+		ToolsAppId				211		// Source SDK
+
+		SearchPaths
+		{
+			Game		|gameinfo_path|.
+			Game		hl2			// pull HL2 content (maps/models/sounds) — requires HL2 (appid 220) owned
+		}
+	}
+}
