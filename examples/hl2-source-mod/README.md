@@ -36,7 +36,12 @@ The event names match PulseCore's built-in HL2 rule pack (`integration/examples/
    git clone https://github.com/ValveSoftware/source-sdk-2013
    ```
    Work in `source-sdk-2013/sp/src`.
-2. Add the integration to the **client** project:
+2. Add the integration to the **client** project. The helper script does the copy + `.vpc` registration
+   for you:
+   ```powershell
+   ./integrate.ps1 -SdkRoot 'C:\path\to\source-sdk-2013'
+   ```
+   Or do it by hand:
    - copy `src/pulsecore_hl2_integration.cpp` → `sp/src/game/client/`
    - copy `vendor/pulsecore_client.h` → `sp/src/game/client/` (or any include dir the client sees)
    - register the .cpp: add `$File "pulsecore_hl2_integration.cpp"` to `sp/src/game/client/client_hl2.vpc`,

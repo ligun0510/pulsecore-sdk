@@ -17,10 +17,10 @@
       "apply": { "right_trigger": { "preset": "gravity_weapon" } } },
     { "on_event": "weapon.primary_fire",
       "apply": { "haptic": { "preset": "weapon_recoil", "intensity": 0.8 } } },
+    { "on_event": "player.damaged",
+      "apply": { "haptic": { "preset": "damage_pulse", "intensity": 0.6 } } },
     { "when": { "state": "vehicle.current", "equals": "airboat" },
       "apply": { "right_trigger": { "preset": "vehicle_accelerator" },
-                 "left_trigger": { "preset": "vehicle_brake" } } },
-    { "when": { "state": "weapon.reloading", "equals": "true" },
-      "apply": { "right_trigger": { "preset": "reload_locked" } } }
+                 "left_trigger": { "preset": "vehicle_brake" } } }
   ]
 }
