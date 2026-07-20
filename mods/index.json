@@ -9,7 +9,8 @@
       "pack": "https://raw.githubusercontent.com/ligun0510/pulsecore-sdk/main/examples/hl2/effects.json",
       "install": "https://github.com/ligun0510/pulsecore-sdk/tree/main/examples/hl2-source-mod",
       "issues": "https://github.com/ligun0510/pulsecore-sdk/issues?q=is%3Aissue+label%3Ahl2",
-      "needs_game_mod": true
+      "needs_game_mod": true,
+      "version": 2
     },
     {
       "id": "community.hl2ep1.enhanced",
@@ -18,7 +19,8 @@
       "pack": "https://raw.githubusercontent.com/ligun0510/pulsecore-sdk/main/examples/hl2/effects.json",
       "install": "https://github.com/ligun0510/pulsecore-sdk/tree/main/examples/hl2-source-mod",
       "issues": "https://github.com/ligun0510/pulsecore-sdk/issues?q=is%3Aissue+label%3Ahl2-episode-one",
-      "needs_game_mod": true
+      "needs_game_mod": true,
+      "version": 2
     },
     {
       "id": "community.hl2ep2.enhanced",
@@ -27,7 +29,8 @@
       "pack": "https://raw.githubusercontent.com/ligun0510/pulsecore-sdk/main/examples/hl2/effects.json",
       "install": "https://github.com/ligun0510/pulsecore-sdk/tree/main/examples/hl2-source-mod",
       "issues": "https://github.com/ligun0510/pulsecore-sdk/issues?q=is%3Aissue+label%3Ahl2-episode-two",
-      "needs_game_mod": true
+      "needs_game_mod": true,
+      "version": 2
     }
   ]
 }
