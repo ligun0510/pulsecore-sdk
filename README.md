@@ -14,7 +14,8 @@ Add **DualSense** adaptive-trigger and haptic effects to your game or mod — wi
 | `protocol/` | **Bridge Protocol v1** — the wire format (newline-delimited JSON) + a tiny header-only JSON helper. No dependencies. |
 | `sdk/` | **Client SDK** — `connect` / `set_state` / `send_event` / `set_value` / `disconnect`. A flat C ABI plus a C++ wrapper. |
 | `examples/test-client/` | A minimal program that connects and sends a few messages. |
-| `examples/hl2/` | The built-in **Half-Life 2 rule pack** (`effects.json`) — which game events map to which trigger effects. |
+| `examples/hl2/` | The built-in **Half-Life 2 effect pack** (`effects.json`) — which game events map to which controller effects. |
+| `mods/index.json` | The **catalogue** PulseCore's Mods tab reads, so the list of installable packs grows without a new build of the app. |
 | `examples/hl2-source-mod/` | A full **Half-Life 2 (Source SDK 2013)** reference mod that reports weapon / vehicle / health events. |
 
 The proprietary parts of PulseCore — the effects engine, the pipe server, the DualSense / USB-IP bridge — are **not** in this repository and are **not needed** to build an integration.
@@ -35,6 +36,8 @@ if (pc.connect({ "community.mygame", "steam:220", "1.0.0" })) {
 ```
 
 There is also a flat **C ABI** (`Pulse_Connect`, `Pulse_SetState`, `Pulse_SendEvent`, …) so you can drive it from any language or loader — see [`sdk/include/pulse/integration.h`](sdk/include/pulse/integration.h).
+
+An **effect pack** is the other half: a JSON file of rules deciding what those reports should *feel* like. Packs are pure data, installed with one click from PulseCore's Mods tab, and they update themselves when you publish a new version — the format and the versioning rules are in **[docs/effect-packs.md](docs/effect-packs.md)**.
 
 For the full message model (Hello / Welcome / State / Event / Value / Heartbeat / Goodbye), the limits, and the pipe name, read **[docs/protocol.md](docs/protocol.md)**. The protocol is deliberately tiny and forward-compatible: unknown message types and unknown state/event/value names are always tolerated, never a hard error.
 
