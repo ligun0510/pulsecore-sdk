@@ -1,5 +1,7 @@
 {
   "schema_version": 1,
+  "_version_note": "pack_version is what the app compares against the catalogue to decide an update.",
+  "pack_version": 2,
   "rules": [
     { "when": { "state": "weapon.current", "equals": "weapon_pistol" },
       "apply": { "right_trigger": { "preset": "pistol" } } },
