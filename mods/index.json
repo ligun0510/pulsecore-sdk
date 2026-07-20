@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "_comment": "Catalogue of PulseCore effect packs. The app reads this to list mods and install them. A pack is DATA (rules) and never code: PulseCore parses it and executes nothing from it.",
+  "mods": [
+    {
+      "id": "community.hl2.enhanced",
+      "title": "Half-Life 2",
+      "game": "Half-Life 2",
+      "pack": "https://raw.githubusercontent.com/ligun0510/pulsecore-sdk/main/examples/hl2/effects.json",
+      "install": "https://github.com/ligun0510/pulsecore-sdk/tree/main/examples/hl2-source-mod",
+      "issues": "https://github.com/ligun0510/pulsecore-sdk/issues?q=is%3Aissue+label%3Ahl2",
+      "needs_game_mod": true
+    },
+    {
+      "id": "community.hl2ep1.enhanced",
+      "title": "Half-Life 2: Episode One",
+      "game": "Half-Life 2: Episode One",
+      "pack": "https://raw.githubusercontent.com/ligun0510/pulsecore-sdk/main/examples/hl2/effects.json",
+      "install": "https://github.com/ligun0510/pulsecore-sdk/tree/main/examples/hl2-source-mod",
+      "issues": "https://github.com/ligun0510/pulsecore-sdk/issues?q=is%3Aissue+label%3Ahl2-episode-one",
+      "needs_game_mod": true
+    },
+    {
+      "id": "community.hl2ep2.enhanced",
+      "title": "Half-Life 2: Episode Two",
+      "game": "Half-Life 2: Episode Two",
+      "pack": "https://raw.githubusercontent.com/ligun0510/pulsecore-sdk/main/examples/hl2/effects.json",
+      "install": "https://github.com/ligun0510/pulsecore-sdk/tree/main/examples/hl2-source-mod",
+      "issues": "https://github.com/ligun0510/pulsecore-sdk/issues?q=is%3Aissue+label%3Ahl2-episode-two",
+      "needs_game_mod": true
+    }
+  ]
+}
