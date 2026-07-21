@@ -1,0 +1,44 @@
+name: Half-Life 2: Episode Two — effect request
+description: Ask for a new feeling in the Episode Two pack, or report one that feels wrong
+labels: ["hl2-episode-two", "effect-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe what you want to **feel**, not how to build it. The how is our problem; knowing what a
+        moment should feel like is the part only a player can supply.
+  - type: textarea
+    id: moment
+    attributes:
+      label: The moment in the game
+      description: Where does it happen? Be specific enough that we can go stand in that spot.
+      placeholder: Firing the shotgun. / Riding the airboat over rough water. / The gravity gun holding something heavy.
+    validations:
+      required: true
+  - type: textarea
+    id: feeling
+    attributes:
+      label: What should it feel like
+      description: Weight, sharpness, rhythm. Comparisons to real objects work better than technical terms.
+      placeholder: The trigger should stop hard, like a real trigger break, then let go with a thump.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Which part of the controller
+      multiple: true
+      options:
+        - Adaptive triggers
+        - Vibration / haptics
+        - Lightbar
+        - Not sure -- surprise me
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Video or a clip helps a lot. So does "the current effect is wrong because...".
+    validations:
+      required: false
