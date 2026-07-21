@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ask in the Discord community
+    url: https://discord.gg/tYRFz6n8Rw
+    about: Faster for questions, help, and "is this supposed to feel like that?"
+  - name: Problem with the PulseCore app itself
+    url: https://github.com/ligun0510/PulseCore/issues/new/choose
+    about: Audio, connection, drivers, crashes -- anything not about an effect pack.
