@@ -1,0 +1,25 @@
+name: Something in a pack is broken
+description: An effect does not fire, fires constantly, or feels wrong after an update
+labels: ["bug", "effect-pack"]
+body:
+  - type: input
+    id: pack
+    attributes:
+      label: Which pack and version
+      description: The version is shown next to the mod id in PulseCore's Mods tab.
+      placeholder: community.hl2.enhanced, version 2
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to see it
+      description: Where in the game, and what you do.
+    validations:
+      required: true
