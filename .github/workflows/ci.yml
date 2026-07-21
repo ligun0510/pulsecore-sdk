@@ -14,3 +14,14 @@ jobs:
         run: cmake -B build -S .
       - name: Build
         run: cmake --build build --config Release
+
+  # PulseCore updates installed effect packs by itself, so anything merged into the catalogue reaches
+  # every player who has that mod without them clicking anything. That makes this a gate rather than
+  # a formality -- it runs in seconds and blocks the merge, long before a release could carry the
+  # mistake out.
+  packs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate effect packs and the catalogue
+        run: python tools/check_packs.py

@@ -44,6 +44,8 @@ A pack with **no** `pack_version`, or one PulseCore cannot read, counts as versi
 3. Increment `version` for that mod in `mods/index.json`.
 4. Open a pull request.
 
+`tools/check_packs.py` runs on every pull request and fails if the two numbers disagree, so this is caught in review rather than in the field.
+
 The catalogue repeats the number so that checking for updates costs one small file instead of downloading every pack just to compare it. If you bump only the pack, nobody is offered the update; if you bump only the catalogue, the app downloads the same pack forever. Move both.
 
 ## The catalogue
@@ -71,6 +73,18 @@ The catalogue repeats the number so that checking for updates costs one small fi
 `id` identifies the pack forever: it names the installed file and it is how PulseCore knows an update belongs to something already installed. Changing it strands every existing install.
 
 `needs_game_mod` is honest labelling. A pack alone is enough only when the game already reports what it is doing. Half-Life 2 does not, so it also needs the game-side mod from `examples/hl2-source-mod/` — and the app says so, instead of pretending one button did everything.
+
+## What CI checks
+
+Because packs update themselves, a mistake merged here reaches players on its own. `tools/check_packs.py` therefore gates every pull request. Run it locally the same way:
+
+```
+python tools/check_packs.py
+```
+
+It rejects a pack that will not parse, a catalogue entry whose `pack` URL does not resolve to a file in this repository, duplicate ids, and the two numbers disagreeing.
+
+It also catches the quiet failure, which is the one that costs a day: **an effect the engine cannot make sense of is dropped, not rejected.** A `duration_ms` of 5000, a trigger `strength` of 20, a `pulse_train` whose `interval_ms` is shorter than its `beat_ms` — the pack still installs, the rule still matches, and nothing happens. There is no error anywhere, so it reads as "the haptics are broken." The checker knows the same limits the engine does and names the field.
 
 ## Adding a pack for a new game
 
