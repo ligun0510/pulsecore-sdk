@@ -86,6 +86,26 @@ It rejects a pack that will not parse, a catalogue entry whose `pack` URL does n
 
 It also catches the quiet failure, which is the one that costs a day: **an effect the engine cannot make sense of is dropped, not rejected.** A `duration_ms` of 5000, a trigger `strength` of 20, a `pulse_train` whose `interval_ms` is shorter than its `beat_ms` — the pack still installs, the rule still matches, and nothing happens. There is no error anywhere, so it reads as "the haptics are broken." The checker knows the same limits the engine does and names the field.
 
+## Where packs and their issues live
+
+**Every pack lives in this one repository, not in a repository of its own.** That is a deliberate
+choice, and the reason is the checker above: `tools/check_packs.py` can only compare a pack against the
+catalogue because it sees both. Split the packs out and the gate has nothing to gate — while the packs
+themselves keep auto-updating onto players' machines.
+
+Requests and reports go here too, through the issue forms, which apply the right label for you:
+
+| I want to… | Use |
+|---|---|
+| ask for a feeling in Half-Life 2 / Episode One / Episode Two | the matching **effect request** form |
+| ask for a game that has no pack yet | **Another game — support request** |
+| report an effect that does not fire or feels wrong | **Something in a pack is broken** |
+| just ask a question | the [Discord](https://discord.gg/tYRFz6n8Rw) — faster than an issue |
+
+A pack will get its own repository the day it gets its own maintainer: at that point separate repos
+solve a real problem (giving someone commit rights to their pack and nothing else). Until then a
+repository per pack would only add empty projects to look at.
+
 ## Adding a pack for a new game
 
 Send a pull request with the pack under `examples/<game>/effects.json` and an entry in `mods/index.json` starting at `"pack_version": 1` / `"version": 1`. Packs are reviewed for feel as much as for correctness: an effect that fires constantly, or one strong enough to be tiring, makes a controller worse rather than better.
