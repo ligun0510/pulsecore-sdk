@@ -66,6 +66,10 @@ This repository is licensed under the **[PolyForm Noncommercial License 1.0.0](L
 
 PulseCore is an independent project — not affiliated with, endorsed by, or sponsored by Sony Interactive Entertainment. "DualSense" and "PlayStation" are trademarks of Sony, used here only to describe compatibility.
 
+## Community
+
+Building something with this, or want an effect pack for a game? **[Join the Discord](https://discord.gg/tYRFz6n8Rw)** — there is a forum for mods and packs, and the people who will use what you make are there.
+
 ## Contributing
 
 See **[CONTRIBUTING.md](CONTRIBUTING.md)**. In short: contributions are welcome under PolyForm Noncommercial 1.0.0, and — so the project can keep offering commercial licenses — you agree the maintainer may also license your contribution commercially.
