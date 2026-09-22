@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 // PulseCore Game Integration — Phase 1 demo client. Connects, reports a shotgun + a fire event, then
 // leaves. Run the developer console first, then this. Uses only the public SDK (no internals).
 #include <chrono>

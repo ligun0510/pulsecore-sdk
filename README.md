@@ -53,13 +53,14 @@ cmake --build build --config Release
 
 This builds `pulse-protocol` + `pulse-sdk` (static libraries) and the `pulse-test-client` example. The Half-Life 2 mod is built separately inside a Source SDK 2013 tree — see [examples/hl2-source-mod/README.md](examples/hl2-source-mod/README.md).
 
-## License — PolyForm Noncommercial 1.0.0
+## License — MIT
 
-This repository is licensed under the **[PolyForm Noncommercial License 1.0.0](LICENSE.md)**. In short: you may use, modify, and share this code **for any noncommercial purpose** — personal projects, free mods, research, education.
+This repository — the protocol, the client SDK, the examples and the effect packs — is licensed under the **[MIT License](LICENSE)**. You may use, modify and share it for **any purpose, including commercial**: free mods, paid mods, Patreon builds, and games that want to talk to PulseCore natively. Keep the copyright and licence notice in copies of the code; that is the only condition.
 
-- Building and sharing a **free** mod that integrates with PulseCore is noncommercial use — go for it.
-- Want to use the SDK in a **commercial** product? A commercial license is available — email **ligun0510@gmail.com**.
-- The **protocol itself is an open specification**: you are free to implement it independently, in any language, under any license. What's licensed here is *this repository's code*.
+- The **protocol itself is an open specification**: you are free to implement it independently, in any language, under any license.
+- **PulseCore itself is not part of this repository and is not open source.** The app, its effects engine, pipe server and DualSense/USB-IP bridge are proprietary and licensed only under the PulseCore end-user licence agreement.
+- Earlier commits of this repository were published under PolyForm Noncommercial 1.0.0. As their sole author, I also make every earlier commit available under the MIT License.
+- A Half-Life 2 mod built from `examples/hl2-source-mod` also contains Valve's Source SDK code, so the resulting binary is additionally governed by Valve's Source 1 SDK License.
 
 "PulseCore" and the PulseCore logo are trademarks of the PulseCore author. This license grants no trademark rights: you may say your mod is *"compatible with PulseCore,"* but you may not use the name or branding as your own.
 
@@ -73,4 +74,4 @@ Building something with this, or want an effect pack for a game? **[Join the Dis
 
 ## Contributing
 
-See **[CONTRIBUTING.md](CONTRIBUTING.md)**. In short: contributions are welcome under PolyForm Noncommercial 1.0.0, and — so the project can keep offering commercial licenses — you agree the maintainer may also license your contribution commercially.
+See **[CONTRIBUTING.md](CONTRIBUTING.md)**. In short: contributions are welcome under the MIT License, the same licence as the rest of the repository.

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 //========= PulseCore Game Integration — Half-Life 2 rumble-bus bridge =========//
 //
 // Half-Life 2 already tells the controller what it should FEEL. The game sends a `Rumble` user message
@@ -15,8 +15,8 @@
 // the game asked for, and then hands the message to the stock RumbleEffect() so ordinary XInput rumble
 // keeps working exactly as before. PulseCore's effects.json decides what a DualSense should do with it.
 //
-// SPDX: PolyForm-Noncommercial-1.0.0 (PulseCore glue). Compiled into a Source mod, the resulting binary is governed by Valve's
-// Source 1 SDK License.
+// Licence: MIT (PulseCore glue). Compiled into a Source mod, the resulting binary is also governed by
+// Valve's Source 1 SDK License.
 //
 // NOT COMPILED HERE (no Source SDK in the PulseCore build environment). Lines marked // [VERIFY] are
 // the ones most likely to need a small adjustment on your first build.

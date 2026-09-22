@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 // PulseCore Game Integration SDK — client API for game mods / plugins / adapters.
 //
 // A tiny surface: connect, report state/events/values, disconnect. The integration reports WHAT happens
 // in the game; PulseCore decides what the DualSense feels. Mods NEVER touch HID and never load into the
-// PulseCore process — they only speak this protocol over the local named pipe. Open source (see LICENSE.md).
+// PulseCore process — they only speak this protocol over the local named pipe. Open source, MIT (see LICENSE).
 #pragma once
 
 #include <string>

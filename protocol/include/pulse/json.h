@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 // PulseCore Game Integration — minimal JSON value + parser/serializer.
 //
 // Deliberately dependency-free and small: the Bridge protocol (v1) and effects.json only need flat

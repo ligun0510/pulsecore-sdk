@@ -1,4 +1,4 @@
-# PulseCore Game Integration — open SDK (PolyForm Noncommercial 1.0.0).
+# PulseCore Game Integration — open SDK (MIT).
 #
 # Layering:
 #   pulse-protocol     protocol v1 + JSON     -> no dependencies      (portable C++)

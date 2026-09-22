@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 // PulseCore Game Integration — Bridge Protocol v1 (envelope + message model).
 //
 // A small, stable core. An integration (game mod / plugin / external adapter) reports WHAT is happening

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 // PulseCore Game Integration — vendored single-header client for a Source SDK 2013 mod.
 //
 // Self-contained (no other PulseCore SDK files needed): drop this one header into your mod, include it

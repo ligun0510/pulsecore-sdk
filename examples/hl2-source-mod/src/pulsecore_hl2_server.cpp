@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 //========= PulseCore Game Integration — Half-Life 2 SERVER side =========//
 //
 // Three of the best feelings in Half-Life 2 are simply not visible to the client, and no client-side
@@ -15,8 +15,8 @@
 // second integration competing with the first for ownership of the same effect channels. Instead it
 // sends a small user message that client.dll forwards over the single existing session.
 //
-// SPDX: PolyForm-Noncommercial-1.0.0 (PulseCore glue). Compiled into a Source mod, the binary is governed by Valve's Source 1
-// SDK License.
+// Licence: MIT (PulseCore glue). Compiled into a Source mod, the binary is also governed by Valve's
+// Source 1 SDK License.
 //
 // NOT COMPILED HERE (no Source SDK in the PulseCore build environment). // [VERIFY] marks the lines
 // most likely to need a small adjustment on your first build.

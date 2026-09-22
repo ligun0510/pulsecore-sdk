@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-License-Identifier: MIT
 //========= PulseCore Game Integration — Half-Life 2 (Source SDK 2013 Singleplayer) =========//
 //
 // Client-side integration: a per-frame game system polls the local player and reports semantic game
@@ -13,8 +13,8 @@
 // first build — each poll below is isolated so a rename is a one-line change. Lines flagged // [VERIFY]
 // are the most likely to need a small adjustment for your SDK fork.
 //
-// SPDX note: this file is PolyForm Noncommercial 1.0.0 (PulseCore glue); once compiled into a Source mod the resulting binary is
-// governed by Valve's Source 1 SDK License (non-commercial mod for a Source game). Keep it in this
+// Licence note: this file is MIT (PulseCore glue); once compiled into a Source mod the resulting binary is
+// also governed by Valve's Source 1 SDK License, which has its own terms for distributing mods. Keep it in this
 // separate example, not in PulseCore's proprietary tree.
 
 #include "cbase.h"                 // must be first in every Source translation unit

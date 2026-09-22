@@ -30,16 +30,8 @@ meant to stay stable — so most contributions are new examples, rule packs, doc
 
 ## Licensing of contributions
 
-By submitting a contribution you agree that:
-
-1. Your contribution is licensed to the project and its users under **PolyForm Noncommercial 1.0.0**
-   (the repository license); and
-2. so the project can continue to offer **commercial licenses** to companies that need them, you also
-   grant the maintainer a perpetual, irrevocable, worldwide right to license your contribution under
-   other terms (including commercial ones), and you confirm you have the right to grant this (it's your
-   own work, or you have permission).
-
-This "inbound = outbound, plus a commercial grant" model is what keeps the SDK both free for the
-community and viable as a product. If you can't grant #2, say so in the PR and we'll figure it out.
+By submitting a contribution you agree that it is licensed to the project and its users under the
+**MIT License** (the repository licence), and you confirm you have the right to do so (it's your own
+work, or you have permission). Inbound = outbound: nothing more is asked of you.
 
 You retain copyright to your contributions.
