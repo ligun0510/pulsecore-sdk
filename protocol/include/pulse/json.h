@@ -4,12 +4,14 @@
 // Deliberately dependency-free and small: the Bridge protocol (v1) and effects.json only need flat
 // objects, arrays, strings, numbers, bools and null. A bounded recursive-descent parser is used so a
 // malformed or hostile message errors out (never crashes / never recurses without limit). Part of the
-// OPEN protocol/SDK layer (PolyForm Noncommercial 1.0.0) — no PulseCore-proprietary dependencies.
+// OPEN protocol/SDK layer — no PulseCore-proprietary dependencies.
 #pragma once
 
+#include <charconv>   // from_chars: locale-independent number parsing (see ParseNumber)
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+#include <system_error>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -124,9 +126,12 @@ inline void DumpTo(std::string& out, const Value& v) {
             if (static_cast<double>(asInt) == n) {
                 out += std::to_string(asInt);   // emit integers without a trailing ".000000"
             } else {
+                // to_chars, not snprintf: snprintf honours LC_NUMERIC, so any host that had called
+                // setlocale() with a comma-decimal locale emitted "0,5" -- invalid JSON that the parser
+                // (already locale-independent, from_chars) rejects.
                 char buf[32];
-                std::snprintf(buf, sizeof(buf), "%.6g", n);
-                out += buf;
+                const auto res = std::to_chars(buf, buf + sizeof(buf), n, std::chars_format::general, 6);
+                out.append(buf, res.ec == std::errc() ? res.ptr : buf);
             }
             break;
         }
@@ -282,14 +287,51 @@ private:
             else if (h >= 'A' && h <= 'F') cp |= static_cast<unsigned int>(h - 'A' + 10);
             else return Fail("invalid \\u hex digit");
         }
-        // Minimal UTF-8 encode of the basic plane (surrogate pairs are not needed for v1 payloads).
+        // A surrogate half is not a character. Encoding one as three bytes produces CESU-8, which is
+        // not valid UTF-8 -- so `"😀"` (an emoji, written the way JSON requires) came out as
+        // six bytes no UTF-8 reader accepts. Nothing downstream can currently be made to misbehave with
+        // it, but "not currently reachable" is a property of today's consumers, not of the parser: the
+        // next thing to read one of these strings is a log file, the state JSON, or the C# UI.
+        //
+        // Pairs are joined properly; a lone half is rejected rather than mangled.
+        if (cp >= 0xD800 && cp <= 0xDBFF) {
+            // High surrogate: a matching low half must follow, spelled as its own \u escape.
+            if (pos_ + 2 > text_.size() || text_[pos_] != '\\' || text_[pos_ + 1] != 'u') {
+                return Fail("lone high surrogate in \\u escape");
+            }
+            pos_ += 2;
+            if (pos_ + 4 > text_.size()) return Fail("truncated low surrogate");
+            unsigned int low = 0;
+            for (int i = 0; i < 4; ++i) {
+                const char h = text_[pos_++];
+                low <<= 4;
+                if (h >= '0' && h <= '9') low |= static_cast<unsigned int>(h - '0');
+                else if (h >= 'a' && h <= 'f') low |= static_cast<unsigned int>(h - 'a' + 10);
+                else if (h >= 'A' && h <= 'F') low |= static_cast<unsigned int>(h - 'A' + 10);
+                else return Fail("invalid \\u hex digit");
+            }
+            if (low < 0xDC00 || low > 0xDFFF) return Fail("invalid low surrogate");
+            cp = 0x10000u + ((cp - 0xD800u) << 10) + (low - 0xDC00u);
+        } else if (cp >= 0xDC00 && cp <= 0xDFFF) {
+            return Fail("lone low surrogate in \\u escape");
+        }
+        // A NUL inside a std::string is a trap for every consumer that later touches it as a C string:
+        // the value silently truncates at the escape. No protocol field has a use for one.
+        if (cp == 0) return Fail("\\u0000 is not permitted");
+
+        // Minimal UTF-8 encode.
         if (cp < 0x80) {
             out.push_back(static_cast<char>(cp));
         } else if (cp < 0x800) {
             out.push_back(static_cast<char>(0xC0 | (cp >> 6)));
             out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
-        } else {
+        } else if (cp < 0x10000) {
             out.push_back(static_cast<char>(0xE0 | (cp >> 12)));
+            out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+            out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+        } else {
+            out.push_back(static_cast<char>(0xF0 | (cp >> 18)));
+            out.push_back(static_cast<char>(0x80 | ((cp >> 12) & 0x3F)));
             out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
             out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
         }
@@ -305,21 +347,50 @@ private:
         if (text_.substr(pos_, 4) == "null") { pos_ += 4; out = Value(); return true; }
         return Fail("invalid literal");
     }
+    /// <summary>
+    /// Parse a JSON number: grammar-checked, then converted without consulting the C locale.
+    ///
+    /// Two defects, both quiet:
+    ///
+    /// 1. The scanner accepted any run of digits and number-ish punctuation, so `1-2`, `1e+-` and
+    ///    `..5` were "numbers"; std::stod then silently took whatever prefix it liked (`1-2` -> 1).
+    ///    Undetected garbage from a third-party mod becomes a plausible-looking effect intensity.
+    /// 2. std::stod honours LC_NUMERIC. Today the process never calls setlocale, so it happens to be
+    ///    "C" and everything works -- but this is an application shipping in 30 languages, and one
+    ///    setlocale(LC_ALL, "") anywhere in the process (or inside a DLL it loads) makes every
+    ///    fractional value from every mod parse as its integer part. "0.5" becomes 0. Nothing would
+    ///    report an error; effects would simply stop scaling.
+    ///
+    /// std::from_chars for floating point is locale-independent by definition and does not throw.
+    /// </summary>
     bool ParseNumber(Value& out) {
         const std::size_t start = pos_;
+        // JSON grammar: -? int frac? exp?
         if (Peek() == '-') ++pos_;
-        while (pos_ < text_.size()) {
-            const char c = text_[pos_];
-            if ((c >= '0' && c <= '9') || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-') ++pos_;
-            else break;
+        const std::size_t intStart = pos_;
+        while (pos_ < text_.size() && text_[pos_] >= '0' && text_[pos_] <= '9') ++pos_;
+        if (pos_ == intStart) return Fail("invalid number: no integer part");
+        if (pos_ < text_.size() && text_[pos_] == '.') {
+            ++pos_;
+            const std::size_t fracStart = pos_;
+            while (pos_ < text_.size() && text_[pos_] >= '0' && text_[pos_] <= '9') ++pos_;
+            if (pos_ == fracStart) return Fail("invalid number: no digits after '.'");
         }
+        if (pos_ < text_.size() && (text_[pos_] == 'e' || text_[pos_] == 'E')) {
+            ++pos_;
+            if (pos_ < text_.size() && (text_[pos_] == '+' || text_[pos_] == '-')) ++pos_;
+            const std::size_t expStart = pos_;
+            while (pos_ < text_.size() && text_[pos_] >= '0' && text_[pos_] <= '9') ++pos_;
+            if (pos_ == expStart) return Fail("invalid number: no digits in exponent");
+        }
+
         const std::string_view tok = text_.substr(start, pos_ - start);
-        if (tok.empty()) return Fail("invalid number");
-        try {
-            out = Value(std::stod(std::string(tok)));
-        } catch (...) {
+        double value = 0.0;
+        const auto result = std::from_chars(tok.data(), tok.data() + tok.size(), value);
+        if (result.ec != std::errc{} || result.ptr != tok.data() + tok.size()) {
             return Fail("number out of range");
         }
+        out = Value(value);
         return true;
     }
 

@@ -13,9 +13,9 @@
 // first build — each poll below is isolated so a rename is a one-line change. Lines flagged // [VERIFY]
 // are the most likely to need a small adjustment for your SDK fork.
 //
-// SPDX note: this file is PolyForm Noncommercial 1.0.0 (PulseCore glue); once compiled into a Source mod
-// the resulting binary is additionally governed by Valve's Source 1 SDK License (non-commercial mod for a
-// Source game). Keep it in this separate example, not in PulseCore's proprietary tree.
+// SPDX note: this file is PolyForm Noncommercial 1.0.0 (PulseCore glue); once compiled into a Source mod the resulting binary is
+// governed by Valve's Source 1 SDK License (non-commercial mod for a Source game). Keep it in this
+// separate example, not in PulseCore's proprietary tree.
 
 #include "cbase.h"                 // must be first in every Source translation unit
 #include "igamesystem.h"           // CAutoGameSystemPerFrame
@@ -23,6 +23,8 @@
 #include "c_basecombatweapon.h"    // C_BaseCombatWeapon
 #include "iclientvehicle.h"        // IClientVehicle // [VERIFY] header name in your SDK
 #include "in_buttons.h"            // IN_ATTACK
+#include "c_basehlplayer.h"         // C_BaseHLPlayer (suit power)      // [VERIFY] path in your SDK
+#include "decals.h"                 // CHAR_TEX_* ground material codes // [VERIFY] path in your SDK
 
 // The vendored PulseCore client. Included last so <windows.h> doesn't fight the Source headers.
 #include "pulsecore_client.h"
@@ -44,6 +46,27 @@ const char* NormalizeVehicle(const char* classname) {
     return classname;
 }
 
+// The material the player is standing on, as a stable name for effects.json. Codes come from the
+// surface properties the movement code already resolves every step (surfacedata_t::game.material,
+// CHAR_TEX_* in decals.h) -- no sound parsing, no guessing from the map.
+const char* GroundMaterialName(char code) {
+    switch (code) {
+        case CHAR_TEX_CONCRETE: return "concrete";
+        case CHAR_TEX_METAL:    return "metal";
+        case CHAR_TEX_GRATE:    return "grate";
+        case CHAR_TEX_VENT:     return "vent";
+        case CHAR_TEX_DIRT:     return "dirt";
+        case CHAR_TEX_SLOSH:    return "water";
+        case CHAR_TEX_TILE:     return "tile";
+        case CHAR_TEX_WOOD:     return "wood";
+        case CHAR_TEX_GLASS:    return "glass";
+        case CHAR_TEX_COMPUTER: return "computer";
+        case CHAR_TEX_FLESH:    return "flesh";
+        case CHAR_TEX_SAND:     return "sand";                          // [VERIFY] exists in your SDK
+        default:                return "default";
+    }
+}
+
 class CPulseCoreIntegration : public CAutoGameSystemPerFrame {
 public:
     CPulseCoreIntegration() : CAutoGameSystemPerFrame("CPulseCoreIntegration") {}
@@ -60,6 +83,7 @@ public:
         m_lastWeapon.Clear();
         m_lastVehicle.Clear();
         m_lastHealth = -1;
+        m_lastCritical.Clear();
         m_lastAttack = false;
         m_readySent = false;
     }
@@ -121,6 +145,110 @@ public:
             m_lastHealth = health;
             m_client.SetValue("player.health", static_cast<double>(health));
         }
+
+        // A separate state rather than a rule reading the number, because "in danger" is a decision
+        // about the game, not about the effect: the threshold belongs with the game's own idea of
+        // critical health, and a rule then only decides what that FEELS like.
+        const char* critical = (health > 0 && health <= 20) ? "true" : "false";
+        if (!m_lastCritical.IsEqualTo(critical)) {
+            m_lastCritical.Set(critical);
+            m_client.SetState("player.critical", critical);
+        }
+
+        PollMedium(pPlayer);
+        PollGround(pPlayer);
+        PollLanding(pPlayer);
+        PollSuit(pPlayer);
+        PollVehicleMotion(pPlayer);
+    }
+
+    // Water / ladder / air. These are STATES, not events: PulseCore holds a sustained level while one
+    // is true and drops it the moment it stops, so swimming hums and walking out of the water is silent
+    // without the mod having to remember to say "stop".
+    void PollMedium(C_BasePlayer* pPlayer) {
+        const char* medium = "air";
+        if (pPlayer->GetMoveType() == MOVETYPE_LADDER) medium = "ladder";              // [VERIFY]
+        else if (pPlayer->GetWaterLevel() >= 2) medium = "water";   // waist-deep or more // [VERIFY]
+        else if (pPlayer->GetWaterLevel() == 1) medium = "shallow_water";
+        if (!m_lastMedium.IsEqualTo(medium)) {
+            const bool enteringWater = Q_strcmp(medium, "water") == 0 &&
+                                       !m_lastMedium.IsEqualTo("shallow_water");
+            m_lastMedium.Set(medium);
+            m_client.SetState("player.medium", medium);
+            if (enteringWater) m_client.SendEvent("player.water_enter");   // the splash
+        }
+    }
+
+    // The material underfoot, reported only while actually on the ground and moving, so standing still
+    // does not stream a state nothing reacts to.
+    void PollGround(C_BasePlayer* pPlayer) {
+        const char* material = "";
+        if (pPlayer->GetGroundEntity() != NULL) {
+            // C_BasePlayer::GetGroundSurface() is protected, so the surface is looked up the same way
+            // the movement code does: trace a short ray down and ask the physics props what was hit.
+            // Reading it ourselves also means the answer stays right if the player is standing on a
+            // prop rather than on world geometry.
+            const Vector origin = pPlayer->GetAbsOrigin();
+            trace_t tr;
+            UTIL_TraceLine(origin + Vector(0.0f, 0.0f, 1.0f), origin - Vector(0.0f, 0.0f, 16.0f),
+                           MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &tr);
+            if (tr.DidHit()) {
+                const surfacedata_t* surface = physprops->GetSurfaceData(tr.surface.surfaceProps);
+                if (surface) material = GroundMaterialName(surface->game.material);
+            }
+        }
+        if (!m_lastGround.IsEqualTo(material)) {
+            m_lastGround.Set(material);
+            m_client.SetState("player.ground_material", material);
+        }
+    }
+
+    // Landing, with the speed it happened at. HL2's own RUMBLE_FALL_SHORT/LONG already fires for big
+    // drops (see the rumble bridge); this adds the CONTINUOUS quantity the waveform ids cannot carry,
+    // so a rule can scale the thump by how far the player actually fell.
+    void PollLanding(C_BasePlayer* pPlayer) {
+        const bool grounded = pPlayer->GetGroundEntity() != NULL;
+        // GetFallVelocity() is protected, and we do not need it: downward speed IS the fall speed, and
+        // reading it straight from the velocity avoids depending on when the engine chooses to zero
+        // its own counter.
+        const float fallSpeed = -pPlayer->GetAbsVelocity().z;
+        if (grounded && !m_wasGrounded && m_peakFall > 100.0f) {
+            m_client.SetValue("player.land_speed", static_cast<double>(m_peakFall));
+            m_client.SendEvent("player.landed");
+        }
+        // Track the peak while airborne: at the instant of landing the engine has already zeroed it.
+        m_peakFall = grounded ? 0.0f : (fallSpeed > m_peakFall ? fallSpeed : m_peakFall);
+        m_wasGrounded = grounded;
+    }
+
+    // HEV suit auxiliary power (sprint / flashlight / oxygen drain it). Quantised to whole percent so a
+    // continuously draining bar does not spend the session's message budget on noise.
+    void PollSuit(C_BasePlayer* pPlayer) {
+        C_BaseHLPlayer* pHL = dynamic_cast<C_BaseHLPlayer*>(pPlayer);                    // [VERIFY]
+        if (!pHL) return;
+        const int power = static_cast<int>(pHL->m_HL2Local.m_flSuitPower);                // [VERIFY]
+        if (power != m_lastSuitPower) {
+            m_lastSuitPower = power;
+            m_client.SetValue("player.suit_power", static_cast<double>(power));
+        }
+    }
+
+    // Vehicle speed from the vehicle ENTITY's velocity rather than the driveable's protected fields:
+    // it needs no subclass, works for both the airboat and the jeep, and is what a rule actually wants
+    // (engine level by speed). Quantised for the same reason as suit power.
+    void PollVehicleMotion(C_BasePlayer* pPlayer) {
+        int speed = 0;
+        if (pPlayer->IsInAVehicle()) {
+            IClientVehicle* pv = pPlayer->GetVehicle();
+            if (C_BaseEntity* pEnt = pv ? pv->GetVehicleEnt() : NULL) {
+                speed = static_cast<int>(pEnt->GetAbsVelocity().Length());               // [VERIFY]
+                speed = (speed / 25) * 25;   // 25-unit buckets: enough for an engine curve
+            }
+        }
+        if (speed != m_lastVehicleSpeed) {
+            m_lastVehicleSpeed = speed;
+            m_client.SetValue("vehicle.speed", static_cast<double>(speed));
+        }
     }
 
 private:
@@ -137,13 +265,29 @@ private:
     pulsecore_client::PulseClient m_client;
     CachedStr m_lastWeapon;
     CachedStr m_lastVehicle;
+    CachedStr m_lastCritical;
+    CachedStr m_lastMedium;
+    CachedStr m_lastGround;
     int m_lastHealth = -1;
+    int m_lastSuitPower = -1;
+    int m_lastVehicleSpeed = -1;
+    float m_peakFall = 0.0f;
+    bool m_wasGrounded = true;
     bool m_lastAttack = false;
     bool m_readySent = false;
     unsigned long m_lastHeartbeat = 0;
+
+public:
+    pulsecore_client::PulseClient& client() { return m_client; }
 };
 
 // Self-registering singleton — no other file needs to reference it.
 CPulseCoreIntegration g_PulseCoreIntegration;
 
 }  // namespace
+
+namespace pulsecore_hl2 {
+// One session for the whole mod. The rumble bridge reports through this same client: two connections
+// would be two integrations competing for ownership of the same effect channels.
+pulsecore_client::PulseClient& SharedClient() { return g_PulseCoreIntegration.client(); }
+}  // namespace pulsecore_hl2
